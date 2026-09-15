@@ -58,6 +58,10 @@
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Download Extension (.zip)
             </a>
+            <button onclick="openLivePreview()" class="bg-[#ff4b13] hover:bg-[#e03a0b] text-white px-8 py-4 rounded-full text-base font-bold transition flex items-center gap-2 w-full sm:w-auto justify-center shadow-[0_0_15px_rgba(255,75,19,0.3)]">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                Live Preview
+            </button>
             <a href="#how-to" class="px-8 py-4 rounded-full text-base font-bold text-gray-300 hover:text-white transition flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 w-full sm:w-auto justify-center">
                 Installation Guide
             </a>
@@ -224,5 +228,60 @@
     <footer class="border-t border-white/10 py-12 text-center text-gray-500 text-sm bg-black relative z-10">
         <p>&copy; 2026 BYPASS Vault. Open source, offline first.</p>
     </footer>
+
+    <!-- Live Preview Modal -->
+    <div id="preview-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <!-- Click outside to close -->
+        <div class="absolute inset-0" onclick="closeLivePreview()"></div>
+        <div class="relative bg-transparent rounded-[32px]" style="width: 360px; height: 600px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1);">
+            <iframe id="preview-iframe" src="" class="w-full h-full border-0 rounded-[32px] overflow-hidden" style="background: #000; border-radius: 32px;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Listen for close message from iframe
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.action === 'close_bypass_vault') {
+                closeLivePreview();
+            }
+        });
+
+        function openLivePreview() {
+            // Seed mock data for preview if not exists
+            if (!localStorage.getItem('chrome_storage_vault')) {
+                const mockVault = [
+                    { id: '1', site: 'Netflix', user: 'bipin_chill@gmail.com', pass: 'N3tfl!x_m0vies2026' },
+                    { id: '2', site: 'GitHub', user: 'BipinDev404', pass: 'D3v_B!p1n#G1tH' },
+                    { id: '3', site: 'Instagram', user: 'bipin_yadav', pass: 'bipin2025' }
+                ];
+                localStorage.setItem('chrome_storage_vault', JSON.stringify(mockVault));
+                localStorage.setItem('chrome_storage_master', '"admin"'); // master pass for preview: admin
+            }
+            
+            const modal = document.getElementById('preview-modal');
+            const iframe = document.getElementById('preview-iframe');
+            
+            iframe.src = '/popup.html';
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Small delay to trigger transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 10);
+        }
+
+        function closeLivePreview() {
+            const modal = document.getElementById('preview-modal');
+            const iframe = document.getElementById('preview-iframe');
+            
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                iframe.src = '';
+            }, 300);
+        }
+    </script>
 </body>
 </html>

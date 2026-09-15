@@ -14,6 +14,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
   }
 }));
 
+// Serve extension files for live preview
+app.use(express.static(path.join(__dirname, 'extension')));
+
 // Fallback route to serve index.html for SPA if needed
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
